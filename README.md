@@ -7,7 +7,7 @@ Parallel Name Search adalah program C yang menggunakan pencarian linear secara p
 1. Clone repository ini:
    ```sh
    git clone https://github.com/syahrilakbar63/Parallel-Name-Search.git
-   cd Parallel_Name_Search
+   cd Parallel-Name-Search
    ```
 
 2. Kompilasi program dengan dukungan OpenMP:

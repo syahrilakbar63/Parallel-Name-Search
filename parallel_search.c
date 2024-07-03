@@ -1,9 +1,7 @@
-
-
-#include <stdio.h>  // Untuk fungsi input/output standar
-#include <string.h> // Untuk fungsi string seperti strcmp
-#include <ctype.h>  // Untuk fungsi konversi karakter seperti tolower
-#include <omp.h>    // Untuk fungsi OpenMP
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <omp.h>
 
 // Fungsi untuk mengubah string menjadi huruf kecil
 void to_lowercase(char *str) {
@@ -14,31 +12,45 @@ void to_lowercase(char *str) {
 
 // Fungsi pencarian linear paralel
 int parallel_linear_search(char *arr[], int size, const char *target) {
-    int index = -1; // Variabel untuk menyimpan indeks elemen yang ditemukan
+    int index = -1;
     int i;
 
-    // Paralelkan loop for menggunakan OpenMP
     #pragma omp parallel for shared(arr, size, target) private(i)
     for (i = 0; i < size; i++) {
         char lower_arr[100];
         strcpy(lower_arr, arr[i]);
         to_lowercase(lower_arr);
 
-        if (strcmp(lower_arr, target) == 0) { // Bandingkan elemen dengan target
-            #pragma omp critical // Seksi kritis untuk mencegah kondisi balapan
+        if (strcmp(lower_arr, target) == 0) {
+            #pragma omp critical
             {
                 if (index == -1 || i < index) {
-                    index = i; // Update indeks elemen yang ditemukan
+                    index = i;
                 }
             }
         }
     }
 
-    return index; // Kembalikan indeks elemen yang ditemukan atau -1 jika tidak ditemukan
+    return index;
+}
+
+// Fungsi pencarian linear serial
+int serial_linear_search(char *arr[], int size, const char *target) {
+    int index = -1;
+    for (int i = 0; i < size; i++) {
+        char lower_arr[100];
+        strcpy(lower_arr, arr[i]);
+        to_lowercase(lower_arr);
+
+        if (strcmp(lower_arr, target) == 0) {
+            index = i;
+            break; // Hentikan pencarian setelah ditemukan
+        }
+    }
+    return index;
 }
 
 int main() {
-    // Daftar nama yang akan dicari
     char *arr[] = {
         "NUR ALAM",
         "SASTRA CHANDRA KIRANA",
@@ -66,30 +78,45 @@ int main() {
         "ULUL AZMI",
         "RIFATUL JAMILA"
     };
-    int size = sizeof(arr) / sizeof(arr[0]); // Hitung ukuran array
-    char target[100];    // Buffer untuk nama yang akan dicari
+    int size = sizeof(arr) / sizeof(arr[0]);
+    char target[100];
 
-    // Ambil input nama yang akan dicari dari terminal
     printf("\nMasukkan nama di kelas B yang akan dicari: ");
     fgets(target, 100, stdin);
-    target[strcspn(target, "\n")] = 0; // Hilangkan newline di akhir input
-    to_lowercase(target); // Ubah target menjadi huruf kecil
+    target[strcspn(target, "\n")] = 0;
+    to_lowercase(target);
 
-    // Cetak daftar nama
     printf("\nDaftar Nama Kelas B:\n");
     for (int i = 0; i < size; i++) {
         printf("%d: %s\n", i, arr[i]);
     }
 
-    // Panggil fungsi pencarian paralel
-    int index = parallel_linear_search(arr, size, target);
+    // Ukur waktu pencarian paralel
+    double start_parallel = omp_get_wtime();
+    int index_parallel = parallel_linear_search(arr, size, target);
+    double end_parallel = omp_get_wtime();
+
+    // Ukur waktu pencarian serial
+    double start_serial = omp_get_wtime();
+    int index_serial = serial_linear_search(arr, size, target);
+    double end_serial = omp_get_wtime();
 
     // Tampilkan hasil pencarian
-    if (index != -1) {
-        printf("\nNama '%s' ditemukan pada indeks %d\n", arr[index], index); // Elemen ditemukan
+    if (index_parallel != -1) {
+        printf("\nNama '%s' ditemukan pada indeks %d (paralel)\n", arr[index_parallel], index_parallel);
     } else {
-        printf("\nNama '%s' tidak ditemukan dalam daftar nama di kelas B\n", target);   // Elemen tidak ditemukan
+        printf("\nNama '%s' tidak ditemukan dalam daftar nama di kelas B (paralel)\n", target);
     }
+
+    if (index_serial != -1) {
+        printf("Nama '%s' ditemukan pada indeks %d (serial)\n", arr[index_serial], index_serial);
+    } else {
+        printf("Nama '%s' tidak ditemukan dalam daftar nama di kelas B (serial)\n", target);
+    }
+
+    // Tampilkan waktu eksekusi
+    printf("\nWaktu eksekusi paralel: %f detik\n", end_parallel - start_parallel);
+    printf("Waktu eksekusi serial: %f detik\n", end_serial - start_serial);
 
     return 0;
 }

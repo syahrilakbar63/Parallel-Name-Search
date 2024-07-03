@@ -1,6 +1,6 @@
 # Parallel Name Search
 
-Proyek ini menggunakan bahasa pemrograman C dan memanfaatkan OpenMP untuk implementasi pencarian paralel. Program ini membaca daftar nama siswa dari kelas B, meminta pengguna untuk memasukkan nama yang ingin dicari, dan kemudian menampilkan hasil pencarian serta waktu eksekusi untuk metode pencarian paralel dan serial.
+Proyek ini menggunakan bahasa pemrograman C dan memanfaatkan OpenMP untuk implementasi pencarian paralel dan serial. Program ini membaca daftar nama siswa dari kelas B, meminta pengguna untuk memasukkan nama yang ingin dicari, dan kemudian menampilkan hasil pencarian serta waktu eksekusi untuk metode pencarian paralel dan serial.
 
 ## Cara Penggunaan
 

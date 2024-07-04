@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include <omp.h>
 
 // Fungsi untuk mengubah string menjadi huruf kecil
@@ -50,35 +51,38 @@ int serial_linear_search(char *arr[], int size, const char *target) {
     return index;
 }
 
+// Fungsi untuk membaca data dari file CSV
+int read_csv(const char *filename, char *arr[], int max_size) {
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        perror("Gagal membuka file");
+        return -1;
+    }
+
+    char line[256];
+    int index = 0;
+
+    while (fgets(line, sizeof(line), file) && index < max_size) {
+        // Hapus newline di akhir baris
+        line[strcspn(line, "\n")] = 0;
+        arr[index] = strdup(line);
+        index++;
+    }
+
+    fclose(file);
+    return index;
+}
+
 int main() {
-    char *arr[] = {
-        "NUR ALAM",
-        "SASTRA CHANDRA KIRANA",
-        "SYAHRIL AKBAR",
-        "JIHAN IZZATHUL MUJIDAH",
-        "FARID KUSUMA WARDANA",
-        "ARNETA",
-        "RESKI ANUGRAH SARI",
-        "MAKMUR JAYA NUR",
-        "MUHAMMAD ASYGAR FAERUDDIN",
-        "MUH RISWAN",
-        "RISAL",
-        "ROMADHAN",
-        "MUH AL IQRAM MARZAH",
-        "SARINA",
-        "SONY ACHMAD DJALIL",
-        "ANUGRAH RESKY SAMUDRA R",
-        "RIZKY MAULIA",
-        "RIZKY JUNI SETIAWAN",
-        "MUHAMMAD ADIL SYAPUTRA",
-        "GEMPAR PERKASA TAHIR",
-        "ISMI SARIF",
-        "NUR ANNISA SYARIFUDDIN",
-        "MUH ULIL AMRI",
-        "ULUL AZMI",
-        "RIFATUL JAMILA"
-    };
-    int size = sizeof(arr) / sizeof(arr[0]);
+    const char *filename = "data.csv";
+    const int max_size = 100;
+    char *arr[max_size];
+    int size = read_csv(filename, arr, max_size);
+
+    if (size == -1) {
+        return 1;
+    }
+
     char target[100];
 
     printf("\nMasukkan nama di kelas B yang akan dicari: ");
@@ -117,6 +121,11 @@ int main() {
     // Tampilkan waktu eksekusi
     printf("\nWaktu eksekusi paralel: %f detik\n", end_parallel - start_parallel);
     printf("Waktu eksekusi serial: %f detik\n", end_serial - start_serial);
+
+    // Bebaskan memori yang dialokasikan
+    for (int i = 0; i < size; i++) {
+        free(arr[i]);
+    }
 
     return 0;
 }

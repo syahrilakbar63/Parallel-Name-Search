@@ -12,7 +12,7 @@ void to_lowercase(char *str) {
 }
 
 // Fungsi pencarian linear paralel
-int parallel_linear_search(char *arr[], int size, const char *target) {
+int parallel_linear_search(char **arr, int size, const char *target) {
     int index = -1;
     int i;
 
@@ -36,7 +36,7 @@ int parallel_linear_search(char *arr[], int size, const char *target) {
 }
 
 // Fungsi pencarian linear serial
-int serial_linear_search(char *arr[], int size, const char *target) {
+int serial_linear_search(char **arr, int size, const char *target) {
     int index = -1;
     for (int i = 0; i < size; i++) {
         char lower_arr[100];
@@ -52,7 +52,7 @@ int serial_linear_search(char *arr[], int size, const char *target) {
 }
 
 // Fungsi untuk membaca data dari file CSV
-int read_csv(const char *filename, char *arr[], int max_size) {
+int read_csv(const char *filename, char **arr, int max_size) {
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
         perror("Gagal membuka file");
@@ -75,11 +75,12 @@ int read_csv(const char *filename, char *arr[], int max_size) {
 
 int main() {
     const char *filename = "data.csv";
-    const int max_size = 100;
-    char *arr[max_size];
+    const int max_size = 100000; // Kapasitas array
+    char **arr = (char **)malloc(max_size * sizeof(char *));
     int size = read_csv(filename, arr, max_size);
 
     if (size == -1) {
+        free(arr);
         return 1;
     }
 
@@ -90,10 +91,7 @@ int main() {
     target[strcspn(target, "\n")] = 0;
     to_lowercase(target);
 
-    printf("\nDaftar Nama Kelas B:\n");
-    for (int i = 0; i < size; i++) {
-        printf("%d: %s\n", i, arr[i]);
-    }
+    printf("\nTarget (lowercase): '%s'\n", target);  // Debug output
 
     // Ukur waktu pencarian paralel
     double start_parallel = omp_get_wtime();
@@ -126,6 +124,7 @@ int main() {
     for (int i = 0; i < size; i++) {
         free(arr[i]);
     }
+    free(arr);
 
     return 0;
 }

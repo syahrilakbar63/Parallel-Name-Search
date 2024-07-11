@@ -86,7 +86,7 @@ int main() {
 
     char target[100];
 
-    printf("\nMasukkan nama di kelas B yang akan dicari: ");
+    printf("\nMasukkan nama yang akan dicari: ");
     fgets(target, 100, stdin);
     target[strcspn(target, "\n")] = 0;
     to_lowercase(target);
@@ -107,13 +107,13 @@ int main() {
     if (index_parallel != -1) {
         printf("\nNama '%s' ditemukan pada indeks %d (paralel)\n", arr[index_parallel], index_parallel);
     } else {
-        printf("\nNama '%s' tidak ditemukan dalam daftar nama di kelas B (paralel)\n", target);
+        printf("\nNama '%s' tidak ditemukan dalam daftar (paralel)\n", target);
     }
 
     if (index_serial != -1) {
         printf("Nama '%s' ditemukan pada indeks %d (serial)\n", arr[index_serial], index_serial);
     } else {
-        printf("Nama '%s' tidak ditemukan dalam daftar nama di kelas B (serial)\n", target);
+        printf("Nama '%s' tidak ditemukan dalam daftar (serial)\n", target);
     }
 
     // Tampilkan waktu eksekusi
